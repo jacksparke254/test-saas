@@ -181,13 +181,13 @@ export const navLinks = [
       height: 1778,
     },
   };
-  
+ 
   export const defaultValues = {
     title: "",
     aspectRatio: "",
     color: "",
     prompt: "",
-    publicId: "",
+    publicID: "",
   };
   
   export const creditFee = -1;
