@@ -30,7 +30,7 @@ export async function checkoutCredits(transaction: CheckoutTransactionParams) {
       credits: transaction.credits,
       buyerId: transaction.buyerId,
     },
-    mode: 'payment',
+    mode: 'subscription',
     success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
     cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
   })

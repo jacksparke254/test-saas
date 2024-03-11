@@ -1,4 +1,5 @@
-/* eslint-disable camelcase */
+"use server"
+
 import { clerkClient } from "@clerk/nextjs";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
@@ -6,6 +7,8 @@ import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 
 import { createUser, deleteUser, updateUser } from "@/lib/actions/user.actions";
+
+
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
@@ -59,10 +62,23 @@ export async function POST(req: Request) {
 
   // CREATE
   if (eventType === "user.created") {
+    console.log("User created event received. Processing...");
     const { id, email_addresses, image_url, first_name, last_name, username } = evt.data;
+
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY!);
+
+    const st_id = await stripe.customers.create({
+      email: String(email_addresses[0].email_address)
+    });
+
+    if (!st_id || !st_id.id) {
+      console.error("Error creating Stripe customer. No 'id' found in the Stripe response:", st_id);
+      return NextResponse.json({ message: "Error creating Stripe customer" });
+  }
 
     const user = {
       clerkId: id,
+      stripeId: st_id.id,
       email: email_addresses[0].email_address,
       username: username!,
       firstName: first_name,
@@ -70,6 +86,7 @@ export async function POST(req: Request) {
       photo: image_url,
     };
 
+    console.log(user)
     const newUser = await createUser(user);
 
     // Set public metadata

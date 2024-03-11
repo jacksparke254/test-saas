@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 import stripe from "stripe";
 
 export async function POST(request: Request) {
-  console.log("here 1")
   const body = await request.text();
 
   const sig = request.headers.get("stripe-signature") as string;
@@ -17,7 +16,6 @@ export async function POST(request: Request) {
   } catch (err) {
     return NextResponse.json({ message: "Webhook error", error: err });
   }
-  console.log("here 2")
   // Get the ID and type
   const eventType = event.type;
 
@@ -33,7 +31,6 @@ export async function POST(request: Request) {
       buyerId: metadata?.buyerId || "",
       createdAt: new Date(),
     };
-    console.log("here 3")
     const newTransaction = await createTransaction(transaction);
     
     return NextResponse.json({ message: "OK", transaction: newTransaction });
