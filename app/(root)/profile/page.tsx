@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { Collection } from "@/components/shared/Collection";
 import Header from "@/components/shared/Header";
 import { getUserImages } from "@/lib/actions/image.actions";
-import { getUserById } from "@/lib/actions/user.actions";
+import { generateCustomerPortalLink, getUserById } from "@/lib/actions/user.actions";
+import Link from "next/link";
 
 
 const Profile = async ({ searchParams }: SearchParamProps) => {
@@ -16,6 +17,8 @@ const Profile = async ({ searchParams }: SearchParamProps) => {
 
   const user = await getUserById(userId);
   const images = await getUserImages({ page, userId: user._id });
+
+  const manage_link = await generateCustomerPortalLink(user?.stripeId)
 
   return (
     <>
@@ -57,6 +60,14 @@ const Profile = async ({ searchParams }: SearchParamProps) => {
           totalPages={images?.totalPages}
           page={page}
         />
+      </section>
+
+      <section>
+        <div>
+          <Link href={""+manage_link}>
+            Manage Billing
+          </Link>
+        </div>
       </section>
     </>
   );

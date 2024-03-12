@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import User from "../database/models/user.model";
 import { connectToDatabase } from "../database/mongoose";
 import { handleError } from "../utils";
+import Stripe from 'stripe';
 
 // CREATE
 export async function createUser(user: CreateUserParams) {
@@ -89,5 +90,29 @@ export async function updateCredits(userId: string, creditFee: number) {
     return JSON.parse(JSON.stringify(updatedUserCredits));
   } catch (error) {
     handleError(error);
+  }
+}
+
+// PORTAL
+
+
+export async function generateCustomerPortalLink(customerId: string) {
+
+  try {
+    
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: process.env.NEXT_PUBLIC_SERVER_URL + "/dashboard/settings/billing", 
+    });
+
+    console.log()
+
+    return portalSession.url;
+
+  } catch (error) {
+
+    console.log(error)
+    return undefined;
   }
 }
